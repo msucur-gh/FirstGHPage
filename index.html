@@ -21,6 +21,12 @@ path.link {
   stroke-width: 1.5px;
 }
 
+.mxd {
+  fill: #FFFF00;
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
 text {
   fill: #000;
   font: 10px sans-serif;
@@ -69,19 +75,17 @@ var div = d3.select("body").append("div")
     .attr("class", "tooltip")               
     .style("opacity", 0);
 
-
 // get the data
-d3.csv("graph_prog_assignment_2 - small.csv", function(error, links) {
-
+d3.csv("graph_prog_assignment_2 - edges.csv", function(error, links) {
 
 // Compute the distinct nodes from the links.
 links.forEach(function(link) {
     link.source = nodes[link.source] || 
-        (nodes[link.source] = {name: link.source, type: "s"});
+        (nodes[link.source] = {name: link.source, type: "s", numsrclnks: 0, numtgtglnks: 0});
     link.target = nodes[link.target] || 
-        (nodes[link.target] = {name: link.target, type: "t"});
-//    link.value = +link.value;
+        (nodes[link.target] = {name: link.target, type: "t", numsrclnks: 0, numtgtglnks: 0});
 });
+
 
 var force = d3.layout.force()
     .nodes(d3.values(nodes))
@@ -128,14 +132,15 @@ node.append("circle")
     .attr("r", 5)
     .attr("class", function(d) { 
 			if(d.type == "s") { 
-				return "src" } 
-			else { 
-				return "tgt"}; })
+				return "src" 
+			} else if(d.type == "t") { 
+				return "tgt"
+			} else { return "mxd"}; })
     .on("mouseover", function(d) {      
             div.transition()        
                 .duration(200)      
-                .style("opacity", .9);      
-            div .html("Product ID: <span class=\"redText\">" + d.name + "</span>")  
+                .style("opacity", .9);
+            div .html("Product ID: <span class=\"redText\">" + d.name)
                 .style("left", (d3.event.pageX) + "px")     
                 .style("top", (d3.event.pageY - 28) + "px");    
             })                  
@@ -175,12 +180,12 @@ force.start();
 </header>
 <p>
 <p>  The displayed graph visualizes Amazon product co-purchasing network. Each node represents a product, the text label is the product amazon ID, and the edge (or link) represents the relationship between two product nodes in terms of Amazon's "<i>Customers Who Bought This Item Also Bought</i>" feature. The edges are directed from "<i>source</i>" node (product purchased) to "<i>target</i>" node (product also purchased by other customers that purchased the "source" product).</p>
-<p>  In this visualization, the source nodes are colored <span class="blueText">blue</span> and target nodes are colored <span class="greenText">green</span>. The selected subset of data contains nodes that are either source (have only edges emanating from it) or target (have only edges pointing to them) but not both.</p>
+<p>  In this visualization, the source nodes are colored <span class="blueText">blue</span> and target nodes are colored <span class="greenText">green</span>. The selected subset of data contains nodes that are either source (have only edges emanating from it) or target (have only edges pointing to them) or both (e.g. node ID 51192).</p>
 <p>  To avoid a clutter created by displaying product IDs besides nodes, I implemented a node tooltip. By hovering the mouse over a node, the user can see the product ID associated with the node.</p>
 <p>  The base data set consits of 262,111 nodes and 1,234,877 edges. For purposes of this visualization, the data set was trimmed substantially by first selecting only nodes that have more than 3 edges either emanating or ending in them. Subsequently, the data set was further reduced only to nodes with no less than 400 edges associated with them and, lastly, only total of 800 edges was selected for the specific visualizaiton being observed. It is easy to see that representing all nodes and edges of the data set would be prohibitive for this project, as it would require substantial customization of the visualizaiton to allow for easier separation of parts of the network for analysis purposes.</p>
 <p>  D3 <i>force layout</i> visualizaiton framework alows a rearrangment of the displayed network by selecting a node and dragging it to another part of the screen in order to see it better. However, due to several "forces" acting on the elements of the visualization (nodes, edges) every time a user performs such action, there is a limit to how much a user can customize the visualization using simple dragging action. This depends on many variables, the "connectedness" of the network being an important one. This can be observed by dragging a node that is well connected with the rest of the network. If one does that, the part of the network the selected node is connected to will be dragged with it, limiting the separation of the selected part of the network from the rest. This also means that, the larger the network, the more difficult it will be to separate individul sub-networks from it.</p>
 
-<p>  The displayed data is only a very small portion of the entire product co-purchase network contained in the base data set. For that reason, it is hard to draw any final conclusions about the base data set. However, this visualization shows the potential of D3 framework to represent the "attractor" products easily (green nodes with a large number of edges ending in them) such as product ID 548091. With more work and customization maybe a visualizaiton tool could be developed that allows for a dyanmic display of millions of nodes and edges by first showing the clusters of highly attractive products and letting user drill down into the graph to discover individual "attractor" products</p>
+<p>  The displayed data is only a very small portion of the entire product co-purchase network contained in the base data set. For that reason, it is hard to draw any final conclusions about the base data set. However, this visualization shows the potential of D3 framework to represent the "attractor" products easily (green nodes with a large number of edges ending in them) such as , for example, product ID 548091. With more work and customization maybe a visualizaiton tool could be developed that allows for a dyanmic display of millions of nodes and edges by first showing the clusters of highly attractive products and letting user drill down into the graph to discover individual "attractor" products</p>
 
   User is highly encouraged to play with the visualization by dragging any of the nodes.
 

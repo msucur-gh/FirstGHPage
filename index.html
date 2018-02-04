@@ -9,12 +9,6 @@ path.link {
   stroke-width: 1.5px;
 }
 
-/*circle {
-  fill: #ccc;
-  stroke: #fff;
-  stroke-width: 1.5px;
-}*/
-
 .src {
   fill: #00F;
   stroke: #fff;
@@ -33,7 +27,20 @@ text {
   pointer-events: none;
 }
 
+.blueText {
+  color: blue;
+  font-weight:bold;
+}
+
+.greenText {
+  color: green;
+  font-weight:bold;
+}
+
 </style>
+<head>
+  <title>Visualization of Amazon co-purchasing product network using D3 force layout</title>
+</head>
 <body>
 <script>
 
@@ -52,17 +59,16 @@ links.forEach(function(link) {
 //    link.value = +link.value;
 });
 
-var width = 1260,
-    height = 1800;
+var width = 1800,
+    height = 2000;
 
 var force = d3.layout.force()
     .nodes(d3.values(nodes))
     .links(links)
     .size([width, height])
     .linkDistance(200)
-    .charge(-80)
-    .on("tick", tick)
-    .start();
+    .charge(-200)
+    .on("tick", tick);
 
 var svg = d3.select("body").append("svg")
     .attr("width", width)
@@ -86,7 +92,6 @@ svg.append("svg:defs").selectAll("marker")
 var path = svg.append("svg:g").selectAll("path")
     .data(force.links())
   .enter().append("svg:path")
-//    .attr("class", function(d) { return "link " + d.type; })
     .attr("class", "link")
     .attr("marker-end", "url(#end)");
 
@@ -132,8 +137,24 @@ function tick() {
   	    return "translate(" + d.x + "," + d.y + ")"; });
 }
 
+force.start();
+
 });
 
 </script>
+<header>
+	<h1 align=center style="color:blue">Visualization of Amazon product co-purchasing network using D3 force layout</h1>
+	<h2 aligh=center> Source: Stanford Large Network Dataset Collection ( 
+	<a href=http://snap.stanford.edu/data/index.html#amazon>http://snap.stanford.edu/data/index.html#amazon</a>)</h2>
+</header>
+<p>
+<p>  The displayed graph visualizes Amazon product co-purchasing network. Each node represents a product, the text label is the product amazon ID, and the edge (or link) represents the relationship between two product nodes in terms of Amazon's "<i>Customers Who Bought This Item Also Bought</i>" feature. The edges are directed from "<i>source</i>" node (product purchased) to "<i>target</i>" node (product also purchased by other customers that purchased the "source" product).</p>
+<p>  In this visualization, the source nodes are colored <span class="blueText">blue</span> and target nodes are colored <span class="greenText">green</span>. The selected subset of data contains nodes that are either source (have only edges emanating from it) or target (have only edges pointing to them) but not both.</p>
+<p>  The base data set consits of 262,111 nodes and 1,234,877 edges. For purposes of this visualization, the data set was trimmed substantially by first selecting only nodes that have more than 3 edges either emanating or ending in them. Subsequently, the data set was further reduced only to nodes with no less than 400 edges associated with them and, lastly, only total of 500 edges was selected for the specific visualizaiton being observed. It is easy to see that representing all nodes and edges of the data set would be prohibitive for this project, as it would require substantial customization of the visualizaiton to allow for easier separation of parts of the network for analysis purposes.</p>
+<p>  D3 force layout alows a rearrangment of the displayed network by selecting a node and dragging it to another part of the screen in order to see it better. However, due to several "forces" acting on the elements of the visualization (nodes, edges) every time a user performs such action, there is a limit to how much a user can customize the visualization using simple dragging action. This depends on many variables, the "connectedness" of the network being an important one. This can be observed by dragging a node that is well connected with the rest of the network. If one does that, the part of the network the selected node is connected to will be dragged with it, limiting the separation of the selected part of the network from the rest. This also means that, the larger the network, the more difficult it will be to separate individul sub-networks from it.</p>
+
+  User is highly encouraged to play with the visualization by dragging any of the nodes.
+
+<p>  Please note that, to see all the portions of the visualization, the user may want to use the vertical and horizontal scroll bars.</p>
 </body>
 </html>
